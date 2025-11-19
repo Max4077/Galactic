@@ -7,7 +7,6 @@ using UnityEngine;
 public class Satelite : GravityObject
 {
     [SerializeField] private Rigidbody objectToOrbit;
-    private bool isFirstFrame = true;
 
     /// <summary>
     /// 0. we get the velocity we need to maintain orbit
@@ -17,9 +16,8 @@ public class Satelite : GravityObject
     /// 4. We get the direction perpindicular to the gravitational force
     /// 5. We un flatten the vector and return and multiply by the necesary velocity
     /// </summary>
-    public void Start()
+    public void Awake()
     {
-        //Before base Start
         float velocity = getOrbitVelocity(); //0.
         Vector2 objectToOrbit2Dpos= new Vector2(objectToOrbit.position.x,objectToOrbit.position.z); //1.
         Vector2 satelite2Dpos = new Vector2(transform.position.x, transform.position.z); //2.
@@ -27,10 +25,21 @@ public class Satelite : GravityObject
         Vector2 perpindecular = Vector2.Perpendicular(direction2D); //4.
         Vector3 direction = new Vector3(perpindecular.x, 0, perpindecular.y); //5.
         initialVelocity = direction * velocity;
+    }
+
+    public void Start()
+    {
+        setConstantVelocity();
 
         base.Start();
+    }
 
-        //After base Start
+    private void setConstantVelocity()
+    {
+        Satelite target = objectToOrbit.GetComponent<Satelite>();
+        if (target == null) return;
+
+        initialVelocity += target.initialVelocity;
     }
 
 
