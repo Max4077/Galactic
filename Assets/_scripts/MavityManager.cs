@@ -1,14 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 /// <summary>
 /// Mavity? - https://www.youtube.com/watch?v=5AGhQst987A
 /// </summary>
 public class MavityManager : MonoBehaviour
 {
+    [SerializeField] private float mavityUpdateTime;
+    private float oldMavityUpdateTime;
     private List<Rigidbody> appliesGravity; //Contains every rigidbody that we want to inflict gravitational force on other objects
     private List<Rigidbody> recievesGravity; //Contains every rigidbody that we want to recieve gravitational forces from other objects
-    public const float G = 1f; //Gravitational constant is normaly 6.67x10^-11. Is currently 1 for simplicity
+    public const float G = 10000f; //Gravitational constant is normaly 6.67x10^-11. Is currently 1 for simplicity
     public static MavityManager Singleton; //Uses a singleton structure so that it can be accesssed by any object
 
     /// <summary>
@@ -22,24 +25,46 @@ public class MavityManager : MonoBehaviour
         Singleton = this;
         appliesGravity = new List<Rigidbody>();
         recievesGravity = new List<Rigidbody>();
+        oldMavityUpdateTime = mavityUpdateTime;
+        handleMavityTime();
+            
     }
 
-    /// <summary>
-    /// TODO: change this to a corouting controlled by
-    /// a public float so that the update rate of gravity
-    /// without affecting other physics
-    /// </summary>
-    private void FixedUpdate()
+    public void FixedUpdate()
     {
-        DoGravity();
+        DoMravity();
     }
 
+    public void Start()
+    {
+        //StartCoroutine(mavityRoutine());
+    }
+
+    public IEnumerator mavityRoutine()
+    {
+        DoMravity();
+        handleMavityTime();
+        yield return new WaitForSeconds(mavityUpdateTime);
+        yield return StartCoroutine(mavityRoutine());
+    }
+
+    private void handleMavityTime()
+    {
+        if (oldMavityUpdateTime <= 0)
+            oldMavityUpdateTime = 0.2f;
+
+        if (mavityUpdateTime <= 0)
+            mavityUpdateTime = oldMavityUpdateTime;
+        else
+            oldMavityUpdateTime = mavityUpdateTime;
+    }
+    
     /// <summary>
     /// Applies the gravataional force of every
     /// object big enough to enact relavent gravitational
     /// to every object we want to respond to gravitational force
     /// </summary>
-    private void DoGravity()
+    private void DoMravity()
     {
         foreach (Rigidbody celestialObject in appliesGravity)
         {

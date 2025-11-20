@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 /// <summary>
 /// Used when we want the Initial Velocity to cause the object to orbit another
@@ -6,7 +7,12 @@ using UnityEngine;
 /// </summary>
 public class Satelite : GravityObject
 {
+
+    //TODO: Set position within Hill Sphere radius
+    [SerializeField] private bool flipDirection;
     [SerializeField] private Rigidbody objectToOrbit;
+    [Range(0f,0.9f)]
+    [SerializeField] private float orbitSpeed;
 
     /// <summary>
     /// 0. we get the velocity we need to maintain orbit
@@ -18,7 +24,8 @@ public class Satelite : GravityObject
     /// </summary>
     public void Awake()
     {
-        float velocity = getOrbitVelocity(); //0.
+        float velocity = getInitialVelocity(); //0.
+        if (flipDirection) velocity *= -1;
         Vector2 objectToOrbit2Dpos= new Vector2(objectToOrbit.position.x,objectToOrbit.position.z); //1.
         Vector2 satelite2Dpos = new Vector2(transform.position.x, transform.position.z); //2.
         Vector2 direction2D = (objectToOrbit2Dpos - satelite2Dpos).normalized; //3.
@@ -29,12 +36,12 @@ public class Satelite : GravityObject
 
     public void Start()
     {
-        setConstantVelocity();
+        addConstantVelocity();
 
         base.Start();
     }
 
-    private void setConstantVelocity()
+    private void addConstantVelocity()
     {
         Satelite target = objectToOrbit.GetComponent<Satelite>();
         if (target == null) return;
@@ -56,5 +63,25 @@ public class Satelite : GravityObject
         float M = objectToOrbit.mass;
         float v = Mathf.Sqrt((G*M)/r);
         return v;
+    }
+
+    /// <summary>
+    /// 0. Is just the equation for orbit velocity
+    /// velocity = sqrt((2 * Gravittional Constant * Mass of the object to orbit)/distance between the objects)
+    /// v = sqrt(2*GM/r)
+    /// </summary>
+    /// <returns></returns>
+    private float getEscapeVelocity()
+    {
+        float G = MavityManager.G;
+        float r = Vector3.Distance(transform.position, objectToOrbit.position);
+        float M = objectToOrbit.mass;
+        float v = Mathf.Sqrt((2*G * M) / r);
+        return v;
+    }
+
+    private float getInitialVelocity()
+    {
+        return Mathf.Lerp(getOrbitVelocity(), getEscapeVelocity(), orbitSpeed);
     }
 }
