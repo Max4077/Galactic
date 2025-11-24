@@ -23,9 +23,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        vMove = Input.GetAxis("Vertical");    
-        hMove = Input.GetAxis("Horizontal");    
+        vMove = Input.GetAxis("Vertical");
+        Debug.Log($"Vmove: {vMove}");
+        hMove = Input.GetAxis("Horizontal");
+        Debug.Log($"hMove: {hMove}");
         rMove = Input.GetAxis("Roll");
+        Debug.Log($"rMove: {rMove}");
 
         mouseInputX = Input.GetAxis("Mouse X");
         mouseInputY = Input.GetAxis("Mouse Y");
@@ -33,6 +36,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        Debug.Log("Fixed Update");
         playerRB.AddForce(playerRB.transform.TransformDirection(Vector3.forward) * vMove * speed, ForceMode.VelocityChange);
         playerRB.AddForce(playerRB.transform.TransformDirection(Vector3.right) * hMove * speed, ForceMode.VelocityChange);
 
