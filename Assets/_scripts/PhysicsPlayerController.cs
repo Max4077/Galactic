@@ -85,6 +85,8 @@ public class PhysicsPlayerController : MonoBehaviour
 
     private void ApplyForces() //swap to AddRelativeTorque
     {
+        Vector3 localAngularVelocity = transform.InverseTransformDirection(playerRB.angularVelocity);
+
         //thrust
         if (isThrusting)
         {
@@ -101,39 +103,39 @@ public class PhysicsPlayerController : MonoBehaviour
         //roll
         if (isRolling)
         {
-            playerRB.AddTorque(new Vector3(0, 0, roll * rollAcceleration), ForceMode.Acceleration);
+            playerRB.AddRelativeTorque(new Vector3(0, 0, roll * rollAcceleration), ForceMode.Acceleration);
         }
         else
         {
-            if (playerRB.angularVelocity.z != 0f)
+            if (localAngularVelocity.z != 0f)
             {
-                playerRB.AddTorque(new Vector3(0, 0, playerRB.angularVelocity.z * rollDeceleration * -1f), ForceMode.Acceleration);
+                playerRB.AddRelativeTorque(new Vector3(0, 0, Mathf.Sign(localAngularVelocity.z) * rollDeceleration * -1f), ForceMode.Acceleration);
             }
         }
 
         //pitch
         if (isPitching)
         {
-            playerRB.AddTorque(new Vector3(pitch * pitchAcceleration, 0, 0), ForceMode.Acceleration);
+            playerRB.AddRelativeTorque(new Vector3(pitch * pitchAcceleration, 0, 0), ForceMode.Acceleration);
         }
         else
         {
-            if(playerRB.angularVelocity.x != 0f)
+            if(localAngularVelocity.x != 0f)
             {
-                playerRB.AddTorque(new Vector3(playerRB.angularVelocity.x * pitchDeceleration * -1, 0, 0), ForceMode.Acceleration);
+                playerRB.AddRelativeTorque(new Vector3(Mathf.Sign(localAngularVelocity.x) * -1, 0, 0), ForceMode.Acceleration);
             }
         }
 
         //yaw
         if (isYawing)
         {
-            playerRB.AddTorque(new Vector3(0, yaw * yawAcceleration, 0), ForceMode.Acceleration);
+            playerRB.AddRelativeTorque(new Vector3(0, yaw * yawAcceleration, 0), ForceMode.Acceleration);
         } 
         else
         {
-            if(playerRB.angularVelocity.y != 0f)
+            if(localAngularVelocity.y != 0f)
             {
-                playerRB.AddTorque(new Vector3(0, playerRB.angularVelocity.y * yawDeceleration * -1, 0), ForceMode.Acceleration);
+                playerRB.AddRelativeTorque(new Vector3(0, localAngularVelocity.y * yawDeceleration * -1, 0), ForceMode.Acceleration);
             }
         }
     }
