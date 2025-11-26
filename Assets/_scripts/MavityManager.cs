@@ -11,7 +11,7 @@ public class MavityManager : MonoBehaviour
     private float oldMavityUpdateTime;
     private List<Rigidbody> appliesGravity; //Contains every rigidbody that we want to inflict gravitational force on other objects
     private List<Rigidbody> recievesGravity; //Contains every rigidbody that we want to recieve gravitational forces from other objects
-    public const float G = 10000f; //Gravitational constant is normaly 6.67x10^-11. Is currently 1 for simplicity
+    public const float G = 10f; //Gravitational constant is normaly 6.67x10^-11. Is currently 1 for simplicity
     public static MavityManager Singleton; //Uses a singleton structure so that it can be accesssed by any object
 
     /// <summary>
