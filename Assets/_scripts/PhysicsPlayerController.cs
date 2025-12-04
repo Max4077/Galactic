@@ -25,13 +25,15 @@ public class PhysicsPlayerController : MonoBehaviour
     private InputAction thrustRollAction;
     private InputAction pitchYawAction;
 
+    public static PhysicsPlayerController Singleton;
+
     [SerializeField] private bool debug;
     private void Awake()
     {
         playerInput = InputSystem.actions.FindActionMap("Player", true);
         thrustRollAction = playerInput.FindAction("Thrust-Roll", true);
         pitchYawAction = playerInput.FindAction("Pitch-Yaw", true);
-
+        Singleton = this;
         //playerRB = GetComponent<Rigidbody>();
     }
 

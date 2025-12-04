@@ -5,18 +5,18 @@ using UnityEngine;
 
 public class Rockets : MonoBehaviour
 {
-    public PlayerController Player;
-
-    private GameObject target;
+    public Transform player;
     private Vector3 waypoint;
+    private Rigidbody rb;
 
     private float timer = 0;
+    [SerializeField] float targetUpdateTime;
+    [SerializeField] private float speed;
 
-    public float speed = 4.0f;
-
-    void Awake()
+    void Start()
     {
-        target = GameObject.FindWithTag("Player");
+        player = PhysicsPlayerController.Singleton.transform;
+        rb = GetComponent<Rigidbody>();
     }
 
     void Update()
@@ -27,12 +27,16 @@ public class Rockets : MonoBehaviour
         }
         if (timer <= 0)
         {
-            waypoint = target.transform.position;
-            timer = 0.5f;
+            waypoint = player.position;
+            timer = targetUpdateTime;
 
         }
+    }
 
-        
+    private void FixedUpdate()
+    {
+        transform.LookAt(waypoint);
+        rb.AddForce(transform.forward*speed, ForceMode.Acceleration);
     }
 
     void OnCollisionEnter(Collision other)
