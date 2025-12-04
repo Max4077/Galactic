@@ -26,6 +26,8 @@ public class PhysicsPlayerController : MonoBehaviour
     private InputAction pitchYawAction;
 
     public static PhysicsPlayerController Singleton;
+    [SerializeField] Vector3 velocity;
+    [SerializeField] Vector3 angularVelo;
 
     [SerializeField] private bool debug;
     private void Awake()
@@ -54,6 +56,8 @@ public class PhysicsPlayerController : MonoBehaviour
     public void FixedUpdate()
     {
         ApplyForces();
+        velocity = playerRB.linearVelocity;
+        angularVelo = playerRB.angularVelocity;
     }
 
     public void Update()
@@ -98,7 +102,7 @@ public class PhysicsPlayerController : MonoBehaviour
         {
             if (playerRB.linearVelocity.magnitude != 0f)
             {
-                playerRB.AddForce(playerRB.linearVelocity.normalized * thrustDeceleration * -1);
+               // playerRB.AddForce(playerRB.linearVelocity.normalized * thrustDeceleration * -1);
             }
         }
 
@@ -109,10 +113,10 @@ public class PhysicsPlayerController : MonoBehaviour
         }
         else
         {
-            if (localAngularVelocity.z != 0f)
+            /*if (localAngularVelocity.z != 0f)
             {
                 playerRB.AddRelativeTorque(new Vector3(0, 0, Mathf.Sign(localAngularVelocity.z) * rollDeceleration * -1f), ForceMode.Acceleration);
-            }
+            }*/
         }
 
         //pitch
@@ -122,10 +126,10 @@ public class PhysicsPlayerController : MonoBehaviour
         }
         else
         {
-            if(localAngularVelocity.x != 0f)
+            /**if(localAngularVelocity.x != 0f)
             {
                 playerRB.AddRelativeTorque(new Vector3(Mathf.Sign(localAngularVelocity.x) * -1, 0, 0), ForceMode.Acceleration);
-            }
+            }*/
         }
 
         //yaw
@@ -135,10 +139,18 @@ public class PhysicsPlayerController : MonoBehaviour
         } 
         else
         {
-            if(localAngularVelocity.y != 0f)
+            /*if(localAngularVelocity.y != 0f)
             {
-                playerRB.AddRelativeTorque(new Vector3(0, localAngularVelocity.y * yawDeceleration * -1, 0), ForceMode.Acceleration);
-            }
+                playerRB.AddRelativeTorque(new Vector3(0, localAngularVelocity.y * yawDeceleration * -1, 0), ForceMode.Force);
+            }*/
         }
+
+        /*if(!isRolling && !isPitching && !isYawing)
+        {
+            if (localAngularVelocity.magnitude != 0f)
+            {
+                playerRB.AddTorque(-1 * yawDeceleration * localAngularVelocity);
+            }
+        }*/
     }
 }
