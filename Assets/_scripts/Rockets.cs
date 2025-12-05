@@ -15,7 +15,7 @@ public class Rockets : MonoBehaviour
 
     void Start()
     {
-        player = PhysicsPlayerController.Singleton.transform;
+        player = ArrowPlayerController.Singleton.transform;
         rb = GetComponent<Rigidbody>();
     }
 
@@ -41,7 +41,7 @@ public class Rockets : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-        PlayerController playerTarget = other.gameObject.GetComponent<PlayerController>();
+        ArrowPlayerController playerTarget = other.gameObject.GetComponent<ArrowPlayerController>();
         if (playerTarget)
         {
             //playerTarget.health -= 10;

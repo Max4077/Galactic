@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class MousePlayerController : MonoBehaviour
 {
     [SerializeField]
     float speed = 1f;

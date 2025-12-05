@@ -2,16 +2,12 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PhysicsPlayerController : MonoBehaviour
+public class ArrowPlayerController : MonoBehaviour
 {
     [SerializeField] private float thrustAcceleration;
-    [SerializeField] private float thrustDeceleration;
     [SerializeField] private float rollAcceleration;
-    [SerializeField] private float rollDeceleration;
     [SerializeField] private float pitchAcceleration;
-    [SerializeField] private float pitchDeceleration;
     [SerializeField] private float yawAcceleration;
-    [SerializeField] private float yawDeceleration;
 
     private float thrust, roll, pitch, yaw;
     private int flipRoll = -1;
@@ -25,9 +21,11 @@ public class PhysicsPlayerController : MonoBehaviour
     private InputAction thrustRollAction;
     private InputAction pitchYawAction;
 
-    public static PhysicsPlayerController Singleton;
+    public static ArrowPlayerController Singleton;
     [SerializeField] Vector3 velocity;
     [SerializeField] Vector3 angularVelo;
+
+    private float[] forwardThrustCurve;
 
     [SerializeField] private bool debug;
     private void Awake()
@@ -38,14 +36,12 @@ public class PhysicsPlayerController : MonoBehaviour
         Singleton = this;
         //playerRB = GetComponent<Rigidbody>();
     }
-
     private void OnEnable()
     {
         playerInput.Enable();
         thrustRollAction.Enable();
         pitchYawAction.Enable();
     }
-
     private void OnDisable()
     {
         playerInput.Disable();
@@ -97,13 +93,6 @@ public class PhysicsPlayerController : MonoBehaviour
         if (isThrusting)
         {
             playerRB.AddForce(playerRB.transform.forward * thrust * thrustAcceleration, ForceMode.Acceleration);
-        } 
-        else
-        {
-            if (playerRB.linearVelocity.magnitude != 0f)
-            {
-               // playerRB.AddForce(playerRB.linearVelocity.normalized * thrustDeceleration * -1);
-            }
         }
 
         //roll
@@ -111,46 +100,23 @@ public class PhysicsPlayerController : MonoBehaviour
         {
             playerRB.AddRelativeTorque(new Vector3(0, 0, roll * rollAcceleration), ForceMode.Acceleration);
         }
-        else
-        {
-            /*if (localAngularVelocity.z != 0f)
-            {
-                playerRB.AddRelativeTorque(new Vector3(0, 0, Mathf.Sign(localAngularVelocity.z) * rollDeceleration * -1f), ForceMode.Acceleration);
-            }*/
-        }
 
         //pitch
         if (isPitching)
         {
             playerRB.AddRelativeTorque(new Vector3(pitch * pitchAcceleration, 0, 0), ForceMode.Acceleration);
         }
-        else
-        {
-            /**if(localAngularVelocity.x != 0f)
-            {
-                playerRB.AddRelativeTorque(new Vector3(Mathf.Sign(localAngularVelocity.x) * -1, 0, 0), ForceMode.Acceleration);
-            }*/
-        }
 
         //yaw
         if (isYawing)
         {
             playerRB.AddRelativeTorque(new Vector3(0, yaw * yawAcceleration, 0), ForceMode.Acceleration);
-        } 
-        else
-        {
-            /*if(localAngularVelocity.y != 0f)
-            {
-                playerRB.AddRelativeTorque(new Vector3(0, localAngularVelocity.y * yawDeceleration * -1, 0), ForceMode.Force);
-            }*/
         }
+    }
 
-        /*if(!isRolling && !isPitching && !isYawing)
-        {
-            if (localAngularVelocity.magnitude != 0f)
-            {
-                playerRB.AddTorque(-1 * yawDeceleration * localAngularVelocity);
-            }
-        }*/
+    private void AnimateRockets()
+    {
+      
     }
 }
+
