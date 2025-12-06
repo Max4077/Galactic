@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.VFX;
 using UnityEngine.InputSystem;
 
 public class ArrowPlayerController : MonoBehaviour
@@ -26,6 +27,8 @@ public class ArrowPlayerController : MonoBehaviour
     [SerializeField] Vector3 angularVelo;
 
     private float[] forwardThrustCurve;
+    [SerializeField] VisualEffect leftBooster;
+    [SerializeField] VisualEffect rightBooster;
 
     [SerializeField] private bool debug;
     private void Awake()
@@ -59,6 +62,7 @@ public class ArrowPlayerController : MonoBehaviour
     public void Update()
     {
         getInputs();
+        AnimateRockets();
     }
 
     private void getInputs()
@@ -116,7 +120,8 @@ public class ArrowPlayerController : MonoBehaviour
 
     private void AnimateRockets()
     {
-      
+        leftBooster.SetVector3("Velocity 1", -velocity);
+        rightBooster.SetVector3("Velocity", velocity);
     }
 }
 
