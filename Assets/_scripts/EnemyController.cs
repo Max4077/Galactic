@@ -9,15 +9,19 @@ public class EnemyController : MonoBehaviour
     LayerMask enemyMask, playerMask;
 
     float attackCooldown = 1f;
-    float lastAttackTime;
+    float lastAttackTime = 0f;
+    float targetCooldown = 2f;
+    float lastTargetTime = 0f;
 
-    int mode = 0;
+    int state = 0;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         player = GameObject.FindWithTag("Player").GetComponent<Transform>();
+
+        currentTarget = player.position;
 
         enemyMask = LayerMask.GetMask("Enemy");
         playerMask = LayerMask.GetMask("Player");
@@ -28,7 +32,7 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(mode == 0)
+        if(state == 0)
         {
             Chase();
         }
@@ -40,11 +44,20 @@ public class EnemyController : MonoBehaviour
 
     void Chase()
     {
-        float playerDistance = Vector3.Distance(player.position, transform.position);
+        
+        UpdateTarget();
+        
+        float playerDistance = Vector3.Distance(currentTarget, transform.position);
 
         if(playerDistance > 10f)
         {
-            transform.LookAt(player.position);
+            var targetRotation = Quaternion.LookRotation(currentTarget - transform.position);
+
+            // Smoothly rotate towards the target point.
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 5 * Time.deltaTime);
+
+
+            //transform.LookAt(currentTarget);
             rb.AddForce(transform.forward * 5f);
         }
 
@@ -59,16 +72,7 @@ public class EnemyController : MonoBehaviour
 
     void Dodge()
     {
-        float objectDistance = Vector3.Distance(currentTarget, transform.position);
-
-        if (objectDistance < 20f)
-        {
-            //transform.LookAt(player.position);
-            //rb.AddForce(-transform.forward * 5f);
-            Debug.Log("In dodge mode");
-        }
-
-        mode = 0; 
+       
     }
 
     void Fire()
@@ -100,11 +104,18 @@ public class EnemyController : MonoBehaviour
         return -1;
     }
 
+    void UpdateTarget()
+    {
+        if (Time.time - lastTargetTime < targetCooldown) return;
+        lastTargetTime = Time.time;
+
+        currentTarget = player.position;
+        Debug.Log("Target Updated");
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        mode = 1;
-        currentTarget = other.transform.position;
-        Debug.Log("Triggered by" + other.gameObject.name);
+        
     }
 
     float UtilityFunction(GameState currentState)
