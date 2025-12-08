@@ -1,3 +1,1 @@
 Skybox - https://deep-fold.itch.io/space-background-generator
-Spaceship - https://assetstore.unity.com/packages/3d/vehicles/space/star-sparrow-modular-spaceship-73167
-Missiles - https://assetstore.unity.com/packages/3d/props/weapons/rockets-missiles-bombs-cartoon-low-poly-pack-73141
