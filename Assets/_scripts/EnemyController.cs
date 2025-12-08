@@ -4,16 +4,19 @@ public class EnemyController : MonoBehaviour
 {
     public Rigidbody rb;
     public Transform player;
+    private Vector3 playerPosition;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        player = GameObject.FindWithTag("Player").GetComponent<Transform>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
         Chase(); 
     }
 
@@ -25,8 +28,11 @@ public class EnemyController : MonoBehaviour
 
     void Chase()
     {
-        this.transform.LookAt(player.position);
-        rb.AddForce(player.position * 20);
+        //this.transform.LookAt(player.position);
+        //rb.AddForce(player.position * 0.5f);
+
+        this.transform.LookAt(playerPosition);
+        this.transform.position = Vector3.MoveTowards(this.transform.position, playerPosition, 20f);
     }
     void Dodge()
     {
