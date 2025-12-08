@@ -10,6 +10,8 @@ public class AdvancedAgent : MonoBehaviour
 {
     //Properties
     [SerializeField] private float startingHealth;
+    [SerializeField] private int startingBreakResource;
+    private int currentBreakResource;
     private float currentHealth;
     [SerializeField] private float scanDistance;
     [SerializeField] private float obstacleScanRate;
@@ -43,12 +45,17 @@ public class AdvancedAgent : MonoBehaviour
     private Vector3 currentTarget;
     private Rigidbody rb;
     private Collider agentCollider;
+    public string phase = "chase";
+    public string role = "behind";
+
+    //phases chase -> flank -> dive
 
     private void Awake()
     {
         hasStarted = false;
         rb = GetComponent<Rigidbody>();
         agentCollider = GetComponent<Collider>();
+        currentBreakResource = startingBreakResource;
 
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -86,6 +93,7 @@ public class AdvancedAgent : MonoBehaviour
 
     private void FixedUpdate()
     {
+        SetTarget();
         Vector3 currentDirection = GetDirection();
         rb.MoveRotation(Quaternion.LookRotation(currentDirection.normalized));
         rb.AddForce(currentDirection * thrustForce, ForceMode.Force);
@@ -153,6 +161,46 @@ public class AdvancedAgent : MonoBehaviour
         }
         return false;
     }*/
+
+    public void SetTarget()
+    {
+        switch (phase)
+        {
+            case ("chase"):
+                currentTarget = player.position;
+                shootRate = 60f * Random.Range(2f, 5f);
+                break;
+            case ("flank"):
+                Vector3 newTarget = Vector3.zero;
+                switch (role)
+                {
+                    case ("behind"):
+                        newTarget = player.position - (player.forward * 5);
+                        break;
+                    case ("above"):
+                        newTarget = player.position + (player.up * 5);
+                        break;
+                    case ("in front"):
+                        newTarget = player.position + (player.forward * 5);
+                        break;
+                    case ("below"):
+                        newTarget = player.position - (player.up * 5);
+                        break;
+                }
+                shootRate = 60f * Random.Range(5f, 8f);
+                currentTarget = newTarget;
+                break;
+            case ("dive"):
+                currentTarget = player.position;
+                shootRate = 20f;
+                break;
+            case ("brake"):
+                currentBreakResource--;
+                rb.linearVelocity = Vector3.zero;
+                break;
+
+        }
+    }
 
     public IEnumerator scanForObstacles()
     {
@@ -269,4 +317,6 @@ public class AdvancedAgent : MonoBehaviour
     {
         yield return new WaitForSeconds(updateStateRate);
     }
+
+
 }
