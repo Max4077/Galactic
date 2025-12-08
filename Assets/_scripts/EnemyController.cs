@@ -48,8 +48,9 @@ public class EnemyController : MonoBehaviour
         UpdateTarget();
         
         float playerDistance = Vector3.Distance(currentTarget, transform.position);
+        Debug.Log("Distance to player: " +  playerDistance);
 
-        if(playerDistance > 10f)
+        if(playerDistance > 100f)
         {
             var targetRotation = Quaternion.LookRotation(currentTarget - transform.position);
 
@@ -59,6 +60,10 @@ public class EnemyController : MonoBehaviour
 
             //transform.LookAt(currentTarget);
             rb.AddForce(transform.forward * 5f);
+        }
+        else
+        {
+            if(!rb.angularVelocity.Equals(Vector3.zero)) rb.AddForce(transform.forward * -5f);
         }
 
         if (Time.time - lastAttackTime < attackCooldown) return;
@@ -72,7 +77,7 @@ public class EnemyController : MonoBehaviour
 
     void Dodge()
     {
-       
+        //Physics.OverlapSphere(transform.position, scanDistance);
     }
 
     void Fire()
@@ -111,11 +116,6 @@ public class EnemyController : MonoBehaviour
 
         currentTarget = player.position;
         Debug.Log("Target Updated");
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        
     }
 
     float UtilityFunction(GameState currentState)
