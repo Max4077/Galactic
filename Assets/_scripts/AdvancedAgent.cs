@@ -15,6 +15,7 @@ public class AdvancedAgent : MonoBehaviour
     [SerializeField] private float obstacleScanRate;
     [SerializeField] private float allyScanRate;
     [SerializeField] private float updateStateRate;
+    [SerializeField] private float shootRate;
     [SerializeField] private float thrustForce;
     //[SerializeField] int extrapolationDistance;
     //[SerializeField] private float extrapolationStepSize;
@@ -70,6 +71,7 @@ public class AdvancedAgent : MonoBehaviour
         {
             StartCoroutine(scanForObstacles());
             StartCoroutine(scanForAllies());
+            StartCoroutine(shoot());
         } 
         else
         {
@@ -167,6 +169,13 @@ public class AdvancedAgent : MonoBehaviour
         allies = Physics.OverlapSphere(transform.position, scanDistance,layerMask);
         yield return new WaitForSeconds(allyScanRate);
         StartCoroutine(scanForAllies());
+    }
+
+    public IEnumerator shoot()
+    {
+        
+        yield return new WaitForSeconds(shootRate);
+        StartCoroutine(shoot());
     }
 
 
