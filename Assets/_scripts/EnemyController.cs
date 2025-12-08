@@ -8,37 +8,54 @@ public class EnemyController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        rb = GetComponentInChildren<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        Chase(); 
     }
 
     private void FixedUpdate()
     {
-        if (player == null) return;
-
-        Vector3 targetDirection = (player.position - transform.position).normalized;
-
-        Vector3 avoidance = Vector3.zero;
-
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 20f))
-        {            
-            avoidance = hit.normal * 30f;
-        }
-
-        Vector3 desiredDirection = (targetDirection + avoidance).normalized;
-
-        Quaternion targetRotation = Quaternion.LookRotation(desiredDirection, Vector3.up);
-        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, 2.5f * Time.fixedDeltaTime));
-
-        float distanceToPlayer = Vector3.Distance(this.transform.position, player.position);
-        //Debug.Log("Distance to player: " +  distanceToPlayer);
-
-        rb.AddForce(transform.forward * 20f, ForceMode.Acceleration);
         
+        
+    }
+
+    void Chase()
+    {
+        this.transform.LookAt(player.position);
+        rb.AddForce(player.position * 20);
+    }
+    void Dodge()
+    {
+
+    }
+
+    float UtilityFunction(GameState currentState)
+    {
+        float score = 0;
+
+        score += -Vector3.Distance(this.transform.position, player.position);
+
+        return score;
+    }
+
+    //bool AimedAtPlayer()
+    //{
+    //    RaycastHit hit;
+    //}
+}
+
+public class GameState
+{
+    public Transform playerPos {  get; set; }
+    public float playerHealth { get; set; }
+
+    GameState(Transform playerPos, float playerHealth)
+    {
+        this.playerPos = playerPos;  
+        this.playerHealth = playerHealth;
     }
 }

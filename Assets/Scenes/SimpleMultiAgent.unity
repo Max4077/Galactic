@@ -365,20 +365,20 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 23198471}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7f8966468ba17649a0ba6c90bd7fa8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   thrustAcceleration: 20
-  thrustDeceleration: 2
   rollAcceleration: 0.5
-  rollDeceleration: 0.1
   pitchAcceleration: 1
-  pitchDeceleration: 1
   yawAcceleration: 1
-  yawDeceleration: 1
   playerRB: {fileID: 313597986}
+  velocity: {x: 0, y: 0, z: 0}
+  angularVelo: {x: 0, y: 0, z: 0}
+  leftBooster: {fileID: 0}
+  rightBooster: {fileID: 0}
   debug: 0
 --- !u!1 &331609557
 GameObject:
@@ -918,21 +918,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 208fe812ae7c90c4f98ebb483f3553c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  myTransform: {fileID: 0}
-  storeTarget: {x: 0, y: 0, z: 0}
-  newTargetPos: {x: 0, y: 0, z: 0}
-  savePos: 0
-  overrideTarget: 0
-  obstacle: {fileID: 0}
-  EscapeDirections: []
-  chasing: 0
-  evading: 0
-  rotationSpeed: 5
-  maxDist: 1000
-  minDist: 60
-  fireDist: 1000
-  moveSpeed: 5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
