@@ -125,6 +125,11 @@ public class ArrowPlayerController : MonoBehaviour
         }
     }
 
+    void OnCollisionEnter(Collision other)
+    {
+       health -= 1;
+    }
+
     private void AnimateRockets()
     {
         leftBooster.SetVector3("Velocity 1", -velocity);

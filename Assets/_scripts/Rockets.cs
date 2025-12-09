@@ -41,13 +41,6 @@ public class Rockets : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-        
-        if (other.gameObject.CompareTag("Player"))
-        {
-            ArrowPlayerController playerTarget = other.gameObject.GetComponent<ArrowPlayerController>();
-            Debug.Log("Collided with player");
-            playerTarget.health -= 1;
-        }
         Destroy(this.gameObject);
     }
 }
