@@ -10,8 +10,6 @@ public class AdvancedAgent : MonoBehaviour
 {
     //Properties
     [SerializeField] private float startingHealth;
-    [SerializeField] private int startingBreakResource;
-    private int currentBreakResource;
     private float currentHealth;
     [SerializeField] private float scanDistance;
     [SerializeField] private float obstacleScanRate;
@@ -22,6 +20,14 @@ public class AdvancedAgent : MonoBehaviour
     //[SerializeField] int extrapolationDistance;
     //[SerializeField] private float extrapolationStepSize;
     //[SerializeField] private float shipWidth;
+
+    [Header("Stratagy Values")]
+    [SerializeField] float startFlankingDistance;
+    [SerializeField] float startDivingDistance;
+    public AdvancedAgent[] squad;
+    public bool readyToDive = false;
+    public string phase = "chase";
+    private bool isLeader = false;
 
     [Header("Flocking Weights")]
     [SerializeField] private float separationWeight;
@@ -41,12 +47,10 @@ public class AdvancedAgent : MonoBehaviour
 
     //Logic
     private bool hasStarted;
-    [SerializeField] private Transform tTarget;
     private Vector3 currentTarget;
     private Rigidbody rb;
     private Collider agentCollider;
-    public string phase = "chase";
-    public string role = "behind";
+    private string[] flankingPositions = { "in front", "below", "above", "behind"};
 
     //phases chase -> flank -> dive
 
@@ -55,13 +59,11 @@ public class AdvancedAgent : MonoBehaviour
         hasStarted = false;
         rb = GetComponent<Rigidbody>();
         agentCollider = GetComponent<Collider>();
-        currentBreakResource = startingBreakResource;
-
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        //player = ArrowPlayerController.Singleton.transform;
+        player = ArrowPlayerController.Singleton.transform;
         currentHealth = startingHealth;
         hasStarted = true;
         gameObject.SetActive(false);
@@ -69,7 +71,8 @@ public class AdvancedAgent : MonoBehaviour
 
     private void Update()
     {
-        currentTarget = tTarget.position;
+        if (currentHealth <= 0) gameObject.SetActive(false);
+        Debug.Log($"Phase: {phase}");
     }
 
     private void OnEnable()
@@ -79,6 +82,7 @@ public class AdvancedAgent : MonoBehaviour
             StartCoroutine(scanForObstacles());
             StartCoroutine(scanForAllies());
             StartCoroutine(shoot());
+            StartCoroutine(updateState());
         } 
         else
         {
@@ -89,13 +93,17 @@ public class AdvancedAgent : MonoBehaviour
     private void OnDisable()
     {
         StopAllCoroutines();
+        currentHealth = startingHealth;
+        squad = null;
+        allies = null;
     }
 
     private void FixedUpdate()
     {
         SetTarget();
         Vector3 currentDirection = GetDirection();
-        rb.MoveRotation(Quaternion.LookRotation(currentDirection.normalized));
+        transform.forward = currentDirection;
+        //rb.MoveRotation(Quaternion.LookRotation(currentDirection.normalized));
         rb.AddForce(currentDirection * thrustForce, ForceMode.Force);
     }
 
@@ -170,35 +178,22 @@ public class AdvancedAgent : MonoBehaviour
                 currentTarget = player.position;
                 shootRate = 60f * Random.Range(2f, 5f);
                 break;
-            case ("flank"):
-                Vector3 newTarget = Vector3.zero;
-                switch (role)
-                {
-                    case ("behind"):
-                        newTarget = player.position - (player.forward * 5);
-                        break;
-                    case ("above"):
-                        newTarget = player.position + (player.up * 5);
-                        break;
-                    case ("in front"):
-                        newTarget = player.position + (player.forward * 5);
-                        break;
-                    case ("below"):
-                        newTarget = player.position - (player.up * 5);
-                        break;
-                }
-                shootRate = 60f * Random.Range(5f, 8f);
-                currentTarget = newTarget;
+            case ("behind"):
+                currentTarget = player.position - (player.forward * 100);
+                break;
+            case ("above"):
+                currentTarget = player.position + (player.up * 100);
+                break;
+            case ("in front"):
+                currentTarget = player.position + (player.forward * 100);
+                break;
+            case ("below"):
+                currentTarget = player.position - (player.up * 100);
                 break;
             case ("dive"):
                 currentTarget = player.position;
                 shootRate = 20f;
                 break;
-            case ("brake"):
-                currentBreakResource--;
-                rb.linearVelocity = Vector3.zero;
-                break;
-
         }
     }
 
@@ -221,8 +216,8 @@ public class AdvancedAgent : MonoBehaviour
 
     public IEnumerator shoot()
     {
-        
         yield return new WaitForSeconds(shootRate);
+        //Do Shoot
         StartCoroutine(shoot());
     }
 
@@ -315,7 +310,80 @@ public class AdvancedAgent : MonoBehaviour
 
     private IEnumerator updateState()
     {
-        yield return new WaitForSeconds(updateStateRate);
+        if(phase == "chase")
+        {
+            if ((transform.position - player.position).magnitude <= startFlankingDistance)
+            {
+                squad = new AdvancedAgent[allies.Length];
+                squad[0] = this;
+                isLeader = true;
+                phase = "in front";
+                rb.linearVelocity = Vector3.zero;
+                separationWeight = 0f;
+                cohesionWeight = 0f;
+                alignmentWeight = 0f;
+                for (int i = 1; i < allies.Length; i++)
+                {
+                    AdvancedAgent aA = allies[i].GetComponent<AdvancedAgent>();
+                    if (aA.phase == "chase")
+                    {
+                        squad[i] = aA;
+                        aA.phase = flankingPositions[i % flankingPositions.Length];
+                        aA.squad = squad;
+                        aA.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+                        squad[i].cohesionWeight = 0f;
+                        squad[i].alignmentWeight = 0f;
+                    }
+                }
+            }
+            
+
+        }
+        else if (phase == "dive")
+        {
+            if ((transform.position - player.position).magnitude > startFlankingDistance)
+            {
+
+                foreach (AdvancedAgent aA in squad)
+                {
+                    aA.phase = "chase";
+                    aA.squad = null;
+                    aA.isLeader = false;
+                }
+                squad = null;
+                isLeader = false;
+
+            }
+        }
+        else
+        {
+            if((transform.position - currentTarget).magnitude <= startDivingDistance)
+            {
+                readyToDive = true;
+                if (isLeader )
+                {
+                    bool doDive = true;
+                    for (int i = 0; i < squad.Length; i++)
+                    {
+                        if (!squad[i].readyToDive) doDive = false;
+                    }
+                    if (doDive)
+                    {
+                        for (int i = 0; i < squad.Length; i++)
+                        {
+                            squad[i].phase = "dive";
+                            squad[i].GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+                            squad[i].separationWeight = 0f;
+                            squad[i].cohesionWeight = 0f;
+                            squad[i].alignmentWeight = 0f;
+
+                        }
+                    }
+                }
+            }
+        }
+            yield return new WaitForSeconds(updateStateRate);
+        StartCoroutine(updateState());
     }
 
 
