@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyController : MonoBehaviour
+public class SimpleMultiAgent : MonoBehaviour
 {
     public Rigidbody rb;
     public Transform player;
@@ -44,11 +44,19 @@ public class EnemyController : MonoBehaviour
 
     void Chase()
     {
-        
+
+        Collider[] nearObstacles = Physics.OverlapSphere(transform.position, 50);
+        if (nearObstacles != null)
+        {
+            Debug.Log("Obstacles Detected");
+            state = 1;
+            return;
+        }
+
         UpdateTarget();
         
         float playerDistance = Vector3.Distance(currentTarget, transform.position);
-        Debug.Log("Distance to player: " +  playerDistance);
+        //Debug.Log("Distance to player: " +  playerDistance);
 
         if(playerDistance > 100f)
         {
@@ -63,11 +71,13 @@ public class EnemyController : MonoBehaviour
         }
         else
         {
-            if(!rb.angularVelocity.Equals(Vector3.zero)) rb.AddForce(transform.forward * -5f);
+            //if(!rb.angularVelocity.Equals(Vector3.zero)) rb.AddForce(transform.forward * -5f);
         }
 
         if (Time.time - lastAttackTime < attackCooldown) return;
         lastAttackTime = Time.time;
+
+        
 
         if (Target() == 1)
         {
@@ -77,7 +87,24 @@ public class EnemyController : MonoBehaviour
 
     void Dodge()
     {
-        //Physics.OverlapSphere(transform.position, scanDistance);
+        Debug.Log("Now in Dodge Mode");
+        
+        Collider[] nearObstacles = Physics.OverlapSphere(transform.position, 50);
+        Vector3 escapeVector = Vector3.zero;
+
+        if(nearObstacles != null)
+        {
+            foreach(Collider thing in nearObstacles)
+            {
+                escapeVector += thing.transform.position;
+            }
+
+            escapeVector += this.transform.forward;
+
+            rb.AddForce(escapeVector * -5f);
+        }
+        state = 0;
+        return;
     }
 
     void Fire()
