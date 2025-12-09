@@ -45,13 +45,13 @@ public class SimpleMultiAgent : MonoBehaviour
     void Chase()
     {
 
-        Collider[] nearObstacles = Physics.OverlapSphere(transform.position, 50);
-        if (nearObstacles != null)
-        {
-            Debug.Log("Obstacles Detected");
-            state = 1;
-            return;
-        }
+        //Collider[] nearObstacles = Physics.OverlapSphere(transform.position, 10);
+        //if (nearObstacles != null)
+        //{
+        //    Debug.Log("Obstacles Detected");
+        //    state = 1;
+        //    return;
+        //}
 
         UpdateTarget();
         
@@ -71,13 +71,11 @@ public class SimpleMultiAgent : MonoBehaviour
         }
         else
         {
-            //if(!rb.angularVelocity.Equals(Vector3.zero)) rb.AddForce(transform.forward * -5f);
+            if(!rb.angularVelocity.Equals(Vector3.zero)) rb.AddForce(transform.forward * -5f);
         }
 
         if (Time.time - lastAttackTime < attackCooldown) return;
         lastAttackTime = Time.time;
-
-        
 
         if (Target() == 1)
         {
@@ -89,19 +87,15 @@ public class SimpleMultiAgent : MonoBehaviour
     {
         Debug.Log("Now in Dodge Mode");
         
-        Collider[] nearObstacles = Physics.OverlapSphere(transform.position, 50);
-        Vector3 escapeVector = Vector3.zero;
+        Collider[] nearObstacles = Physics.OverlapSphere(transform.position, 10);
 
         if(nearObstacles != null)
         {
             foreach(Collider thing in nearObstacles)
             {
-                escapeVector += thing.transform.position;
+                if(Vector3.Distance(thing.transform.position, transform.position) < 100f) rb.AddForce(transform.forward * -5f);
             }
 
-            escapeVector += this.transform.forward;
-
-            rb.AddForce(escapeVector * -5f);
         }
         state = 0;
         return;
