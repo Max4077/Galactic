@@ -2186,7 +2186,7 @@ GameObject:
   - component: {fileID: 8178330194520308559}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2309,6 +2309,8 @@ MonoBehaviour:
   playerRB: {fileID: 5649393970378602172}
   velocity: {x: 0, y: 0, z: 0}
   angularVelo: {x: 0, y: 0, z: 0}
+  leftBooster: {fileID: 0}
+  rightBooster: {fileID: 0}
   debug: 0
 --- !u!1 &8730327066071466082
 GameObject:
