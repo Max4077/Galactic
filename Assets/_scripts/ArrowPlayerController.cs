@@ -17,6 +17,8 @@ public class ArrowPlayerController : MonoBehaviour
     private bool isThrusting, isRolling, isPitching, isYawing;
     private float mouseInputX, mouseInputY;
 
+    public int health = 3;
+
     private InputActionMap playerInput;
     [SerializeField] private Rigidbody playerRB;
     private InputAction thrustRollAction;
@@ -63,6 +65,11 @@ public class ArrowPlayerController : MonoBehaviour
     {
         getInputs();
         AnimateRockets();
+
+        if (health <= 0)
+        {
+            this.gameObject.SetActive(false);
+        }
     }
 
     private void getInputs()
@@ -116,6 +123,11 @@ public class ArrowPlayerController : MonoBehaviour
         {
             playerRB.AddRelativeTorque(new Vector3(0, yaw * yawAcceleration, 0), ForceMode.Acceleration);
         }
+    }
+
+    void OnCollisionEnter(Collision other)
+    {
+       health -= 1;
     }
 
     private void AnimateRockets()
